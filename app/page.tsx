@@ -47,6 +47,34 @@ export default function Home() {
     window.location.href = `https://www.youtube.com/watch?v=${videoId}`;
   };
 
+  const handleShare = async (videoId: string, videoTitle: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareUrl = `https://www.chimba.in/watch?v=${videoId}`;
+
+    // Try native share API first (works on mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: videoTitle,
+          text: `Watch "${videoTitle}" on ChimbanumChimbiyum`,
+          url: shareUrl,
+        });
+        return;
+      } catch (err) {
+        // User cancelled or error, fall back to clipboard
+      }
+    }
+
+    // Fallback: Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Link copied to clipboard!");
+    } catch (err) {
+      // Final fallback: Show the URL
+      prompt("Copy this link:", shareUrl);
+    }
+  };
+
   const formatViews = (count: number) => {
     if (count >= 1000000) {
       return `${(count / 1000000).toFixed(1)}M views`;
@@ -177,9 +205,30 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="p-4 sm:p-6">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
-                      {videos.latest.title}
-                    </h3>
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-800 flex-1">
+                        {videos.latest.title}
+                      </h3>
+                      <button
+                        onClick={(e) => handleShare(videos.latest.id, videos.latest.title, e)}
+                        className="flex-shrink-0 p-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                        title="Share video"
+                      >
+                        <svg
+                          className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                     <p className="text-sm sm:text-base text-gray-600">
                       {formatViews(videos.latest.viewCount)} •{" "}
                       {formatDate(videos.latest.publishedAt)}
@@ -223,9 +272,30 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="p-3 sm:p-4">
-                        <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-2 line-clamp-2">
-                          {video.title}
-                        </h3>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="text-sm sm:text-base font-bold text-gray-800 line-clamp-2 flex-1">
+                            {video.title}
+                          </h3>
+                          <button
+                            onClick={(e) => handleShare(video.id, video.title, e)}
+                            className="flex-shrink-0 p-1.5 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                            title="Share video"
+                          >
+                            <svg
+                              className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                              />
+                            </svg>
+                          </button>
+                        </div>
                         <p className="text-xs sm:text-sm text-gray-600">
                           {formatViews(video.viewCount)} •{" "}
                           {formatDate(video.publishedAt)}
