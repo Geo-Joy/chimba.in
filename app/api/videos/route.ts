@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+// Disable caching for this route
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const API_KEY = process.env.YOUTUBE_API_KEY;
   const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
@@ -15,7 +19,7 @@ export async function GET() {
     // Fetch channel statistics
     const channelResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?key=${API_KEY}&id=${CHANNEL_ID}&part=statistics,snippet`,
-      { next: { revalidate: 3600 } }
+      { cache: "no-store" }
     );
 
     if (!channelResponse.ok) {
@@ -30,7 +34,7 @@ export async function GET() {
     // Fetch latest videos from the channel
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`,
-      { next: { revalidate: 3600 } } // Cache for 1 hour
+      { cache: "no-store" }
     );
 
     if (!response.ok) {
@@ -46,7 +50,7 @@ export async function GET() {
 
     const statsResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoIds}&part=statistics,snippet`,
-      { next: { revalidate: 3600 } }
+      { cache: "no-store" }
     );
 
     if (!statsResponse.ok) {
@@ -85,7 +89,7 @@ export async function GET() {
       .sort((a, b) => b.viewCount - a.viewCount)
       .slice(0, 2);
 
-    return NextResponse.json({
+    const responseData = {
       latest,
       trending,
       allVideos: videos,
@@ -93,6 +97,14 @@ export async function GET() {
         subscriberCount: parseInt(channelStats?.subscriberCount || "0"),
         viewCount: parseInt(channelStats?.viewCount || "0"),
         videoCount: parseInt(channelStats?.videoCount || "0"),
+      },
+    };
+
+    return NextResponse.json(responseData, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
   } catch (error) {
