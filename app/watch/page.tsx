@@ -35,11 +35,6 @@ function WatchVideo() {
         } else {
           setVideo(data);
           setLoading(false);
-
-          // Auto redirect to YouTube after 2 seconds
-          setTimeout(() => {
-            window.location.href = `https://www.youtube.com/watch?v=${videoId}`;
-          }, 2000);
         }
       })
       .catch(() => {
@@ -117,10 +112,6 @@ function WatchVideo() {
                 More Videos
               </a>
             </div>
-
-            <p className="text-gray-500 text-sm text-center mt-4">
-              Redirecting to YouTube in a few seconds...
-            </p>
           </div>
         </div>
       </div>

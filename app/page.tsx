@@ -55,8 +55,6 @@ export default function Home() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: videoTitle,
-          text: `Watch "${videoTitle}" on ChimbanumChimbiyum`,
           url: shareUrl,
         });
         return;
