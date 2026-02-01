@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 import { WatchButton } from "./WatchButton";
 
 interface VideoData {
@@ -54,6 +55,61 @@ async function getVideoData(videoId: string): Promise<VideoData | null> {
     console.error("Error fetching video:", error);
     return null;
   }
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ v?: string }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const videoId = params?.v;
+
+  if (!videoId) {
+    return {
+      title: "Watch Video - Chimba.in",
+      description: "ChimbanumChimbiyum Kids Entertainment Channel",
+    };
+  }
+
+  const video = await getVideoData(videoId);
+
+  if (!video) {
+    return {
+      title: "Watch Video - Chimba.in",
+      description: "ChimbanumChimbiyum Kids Entertainment Channel",
+    };
+  }
+
+  const title = `${video.title} - ChimbanumChimbiyum`;
+  const description = video.description.substring(0, 155) || "Watch this video from ChimbanumChimbiyum Kids Entertainment Channel";
+  const url = `https://www.chimba.in/watch?v=${videoId}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "ChimbanumChimbiyum",
+      images: [
+        {
+          url: video.thumbnail,
+          width: 1280,
+          height: 720,
+          alt: video.title,
+        },
+      ],
+      type: "video.other",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [video.thumbnail],
+    },
+  };
 }
 
 export default async function WatchPage({
