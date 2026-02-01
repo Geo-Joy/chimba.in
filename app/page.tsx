@@ -49,7 +49,7 @@ export default function Home() {
 
   const handleShare = async (videoId: string, videoTitle: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const shareUrl = `https://www.chimba.in/watch?v=${videoId}`;
+    const shareUrl = `https://www.chimba.in/v/${videoId}`;
 
     // Try native share API first (works on mobile)
     if (navigator.share) {
