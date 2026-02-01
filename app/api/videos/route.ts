@@ -57,15 +57,25 @@ export async function GET() {
 
     const statsData = await statsResponse.json();
 
-    // Format the data
-    const videos = statsData.items.map((item: any) => ({
-      id: item.id,
-      title: item.snippet.title,
-      thumbnail: item.snippet.thumbnails.high.url,
-      publishedAt: item.snippet.publishedAt,
-      viewCount: parseInt(item.statistics.viewCount || "0"),
-      likeCount: parseInt(item.statistics.likeCount || "0"),
-    }));
+    // Format the data with highest quality thumbnails
+    const videos = statsData.items.map((item: any) => {
+      // Use maxres (1280x720) if available, fallback to standard (640x480) or high (480x360)
+      const thumbnails = item.snippet.thumbnails;
+      const thumbnail =
+        thumbnails.maxres?.url ||
+        thumbnails.standard?.url ||
+        thumbnails.high?.url ||
+        thumbnails.medium?.url;
+
+      return {
+        id: item.id,
+        title: item.snippet.title,
+        thumbnail,
+        publishedAt: item.snippet.publishedAt,
+        viewCount: parseInt(item.statistics.viewCount || "0"),
+        likeCount: parseInt(item.statistics.likeCount || "0"),
+      };
+    });
 
     // Get latest video (most recent)
     const latest = videos[0];

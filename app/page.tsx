@@ -161,6 +161,8 @@ export default function Home() {
                       src={videos.latest.thumbnail}
                       alt={videos.latest.title}
                       className="w-full aspect-video object-cover"
+                      loading="eager"
+                      decoding="async"
                     />
                     <div className="absolute inset-0 bg-black/20 active:bg-black/10 sm:hover:bg-black/10 transition-all flex items-center justify-center">
                       <div className="bg-red-600 rounded-full p-3 sm:p-4 transform active:scale-110 sm:hover:scale-110 transition-transform">
@@ -205,6 +207,8 @@ export default function Home() {
                           src={video.thumbnail}
                           alt={video.title}
                           className="w-full aspect-video object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="absolute inset-0 bg-black/20 active:bg-black/10 sm:hover:bg-black/10 transition-all flex items-center justify-center">
                           <div className="bg-red-600 rounded-full p-2 sm:p-3 transform active:scale-110 sm:hover:scale-110 transition-transform">
