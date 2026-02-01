@@ -105,5 +105,9 @@ export default function WatchLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      {children}
+    </>
+  );
 }
