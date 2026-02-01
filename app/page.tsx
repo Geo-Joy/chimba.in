@@ -4,18 +4,29 @@ import { useEffect } from "react";
 
 export default function Home() {
   useEffect(() => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
+    const userAgent = navigator.userAgent;
+    const isAndroid = /Android/i.test(userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+    const isMobile = isAndroid || isIOS;
 
     const channelUrl = "https://www.youtube.com/@ChimbanumChimbiyum";
-    const youtubeAppUrl = "vnd.youtube://www.youtube.com/@ChimbanumChimbiyum";
 
-    if (isMobile) {
-      // Try to open in native YouTube app first
+    if (isAndroid) {
+      // For Android, use intent URL to open YouTube app
+      const intentUrl =
+        "intent://www.youtube.com/@ChimbanumChimbiyum#Intent;" +
+        "scheme=https;" +
+        "package=com.google.android.youtube;" +
+        "S.browser_fallback_url=https://www.youtube.com/@ChimbanumChimbiyum;" +
+        "end";
+
+      window.location.href = intentUrl;
+    } else if (isIOS) {
+      // For iOS, try youtube:// scheme first
+      const youtubeAppUrl = "youtube://www.youtube.com/@ChimbanumChimbiyum";
       window.location.href = youtubeAppUrl;
 
-      // Fallback to web URL after a short delay if app doesn't open
+      // Fallback to web URL if app doesn't open
       setTimeout(() => {
         window.location.href = channelUrl;
       }, 1500);
