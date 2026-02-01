@@ -12,6 +12,21 @@ export async function GET() {
   }
 
   try {
+    // Fetch channel statistics
+    const channelResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?key=${API_KEY}&id=${CHANNEL_ID}&part=statistics,snippet`,
+      { next: { revalidate: 3600 } }
+    );
+
+    if (!channelResponse.ok) {
+      const errorData = await channelResponse.json();
+      console.error("YouTube Channel API error:", errorData);
+      throw new Error(`YouTube Channel API error: ${JSON.stringify(errorData)}`);
+    }
+
+    const channelData = await channelResponse.json();
+    const channelStats = channelData.items[0]?.statistics;
+
     // Fetch latest videos from the channel
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`,
@@ -64,6 +79,11 @@ export async function GET() {
       latest,
       trending,
       allVideos: videos,
+      channelStats: {
+        subscriberCount: parseInt(channelStats?.subscriberCount || "0"),
+        viewCount: parseInt(channelStats?.viewCount || "0"),
+        videoCount: parseInt(channelStats?.videoCount || "0"),
+      },
     });
   } catch (error) {
     console.error("Error fetching YouTube videos:", error);
